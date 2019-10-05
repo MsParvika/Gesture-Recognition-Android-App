@@ -10,7 +10,7 @@ import android.widget.Spinner;
 
 public class FirstActivity extends AppCompatActivity {
 
-    public static final String[] GESTURES = {"buy", " house", " fun", " hope", " arrive", " really", " read", " lip", " mouth", " some", " communicate", " write", " create", " pretend", " sister", " man", " one", " drive", " perfect", " mother"};
+    public static final String[] GESTURES = {"Select One...", "buy", " house", " fun", " hope", " arrive", " really", " read", " lip", " mouth", " some", " communicate", " write", " create", " pretend", " sister", " man", " one", " drive", " perfect", " mother"};
     Spinner gestureDropDown;
     String dropDownValue;
     Intent intent;
@@ -30,10 +30,11 @@ public class FirstActivity extends AppCompatActivity {
                                        int position, long id) {
 
                 dropDownValue = (String) gestureDropDown.getSelectedItem();
-
-                intent = new Intent(FirstActivity.this, SecondActivity.class);
-                intent.putExtra("gestureName", dropDownValue);
-                startActivity(intent);
+                if(!dropDownValue.equalsIgnoreCase("Select...")) {
+                    intent = new Intent(FirstActivity.this, SecondActivity.class);
+                    intent.putExtra("gestureName", dropDownValue);
+                    startActivity(intent);
+                }
             }
 
             @Override
