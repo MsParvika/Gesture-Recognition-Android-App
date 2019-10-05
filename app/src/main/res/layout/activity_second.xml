@@ -7,7 +7,7 @@
     tools:context=".SecondActivity">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/practice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Practice"
@@ -17,4 +17,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.21" />
+
+    <VideoView
+        android:id="@+id/signVideo"
+        android:layout_width="330dp"
+        android:layout_height="354dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/practice" />
 </android.support.constraint.ConstraintLayout>
