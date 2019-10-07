@@ -1,12 +1,16 @@
 package com.example.gesturerecognition1;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -18,8 +22,11 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
-public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Callback, View.OnClickListener {
+public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
     private MediaRecorder recorder;
     private Camera camera;
@@ -28,32 +35,68 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private Button mToggleButton;
     private TextView tv_timer;
     private TextView tv_time;
+    private SharedPreferences sharedPreferences;
+    private String action;
+    private String filePath;
+    CountDownTimer countDownTimer;
+    CountDownTimer recordingTime;
     boolean recording = false;
+    private boolean isInit = false;
+    boolean newFile = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        setContentView(R.layout.activity_third);
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        recorder = new MediaRecorder();
-        initRecorder();
-        setContentView(R.layout.activity_third);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+
+        if(getIntent().hasExtra(Constants.ACTION)) {
+            action = getIntent().getStringExtra(Constants.ACTION);
+        }
 
         surfaceView = (SurfaceView) findViewById(R.id.camera);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
-        tv_timer = (TextView) findViewById(R.id.timer);
-        //tv_time = (TextView) findViewById(R.id.tv_time);
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        surfaceView.setClickable(true);
-        surfaceView.setOnClickListener(this);
+
+        tv_timer = (TextView) findViewById(R.id.tv_timer);
+        tv_time = (TextView) findViewById(R.id.tv_time);
+        mToggleButton = (Button) findViewById(R.id.bt_start);
+        sharedPreferences =  this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+
+        recordingTime = getRecordingCountDown();
+
+        mToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            // toggle video recording
+            public void onClick(final View v) {
+
+                countDownTimer = getCountDownTimer(v);
+
+                if (((Button) v).getText().toString().equals("Start Recording")) {
+                    countDownTimer.start();
+                }
+//                } else if (((Button) v).getText().toString().equals("Stop Recording")) {
+//                    recorder.stop();
+//                    recorder.reset();
+//                    ((Button) v).setText("Start Recording");
+//                    if(recordingTime != null) {
+//                        recordingTime.cancel();
+//                    }
+//                    countDownTimer.cancel();
+//                    tv_timer.setVisibility(View.VISIBLE);
+//                }
+            }
+        });
 
     }
 
-    private void initRecorder() {
+    private void initRecorder(Surface surface) throws IOException{
+
         if(camera == null) {
             camera = Camera.open(1);
             camera.setDisplayOrientation(90);
@@ -65,62 +108,69 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
             camera.startPreview();
             camera.unlock();
         }
+
         if(recorder == null)
             recorder = new MediaRecorder();
+        recorder.setPreviewDisplay(surface);
         recorder.setCamera(camera);
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        recorder.setMaxDuration(5000); // 5 seconds
+        recorder.setOrientationHint(270);
+        recorder.setVideoFrameRate(30);
+        recorder.setVideoEncodingBitRate(3000000);
+        recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-        CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        recorder.setProfile(cpHigh);
+        int i=0;
+        SimpleDateFormat s = new SimpleDateFormat("ddMMyyyyhhmmss", Locale.US);
+        String format = s.format(new Date());
 
-        // TODO : File name using ID
-/*        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/GestureRecognition/"
-                + sharedPreferences.getString(INTENT_ID,"0000")+"_"+word+"_0_"+format  + ".mp4");
-        //just to be safe
+        File file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
+                + sharedPreferences.getString(Constants.RECORDING_ID,"0000") + "_" + action + "_0_" + format  + ".mp4");
+
+        file.getParentFile().mkdirs();
+
         while(file.exists()) {
             i++;
-            file = new File(Environment.getExternalStorageDirectory().getPath() + "/Learn2Sign/"
-                    + sharedPreferences.getString(INTENT_ID,"0000")+"_"+word+"_"+i +"_"+format+ ".mp4");
-        }*/
-        // TODO : Till here
-
-        recorder.setOutputFile("/sdcard/videocapture_example.mp4");
-        recorder.setMaxDuration(5000); // 50 seconds
-        recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
-    }
-
-    public void onClick(View v) {
-        if (recording) {
-            recorder.stop();
-            recording = false;
-
-            // Let's initRecorder so we can record again
-            initRecorder();
-            prepareRecorder();
-        } else {
-            recording = true;
-            recorder.start();
+            file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
+                    + sharedPreferences.getString(Constants.RECORDING_ID,"0000") + "_" + action + "_" + i + "_" + format + ".mp4");
         }
-    }
 
-    private void prepareRecorder() {
-        recorder.setPreviewDisplay(surfaceHolder.getSurface());
+        if(file.createNewFile()) {
+            newFile = true;
+            filePath = file.getPath();
+        }
+
+        recorder.setOutputFile(file.getPath());
+        recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+            @Override
+            public void onInfo(MediaRecorder mr, int what, int extra) {
+                if(what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
+                    recorder.stop();
+                    recorder.reset();
+                }
+            }
+        });
 
         try {
             recorder.prepare();
         } catch (IllegalStateException e) {
             e.printStackTrace();
-            finish();
-        } catch (IOException e) {
-            e.printStackTrace();
-            finish();
         }
+
+        isInit = true;
+
     }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        prepareRecorder();
+        try {
+            if(!isInit)
+                initRecorder(surfaceHolder.getSurface());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -136,5 +186,43 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
         }
         recorder.release();
         finish();
+    }
+
+    private CountDownTimer getCountDownTimer(final View v){
+        return new CountDownTimer(3000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                int a = (int) (millisUntilFinished / 1000);
+                tv_timer.setText(a + " ");
+                ((Button) v).setEnabled(false);
+            }
+
+            public void onFinish() {
+                tv_timer.setVisibility(View.GONE);
+                ((Button) v).setText("Recording");
+                ((Button) v).setVisibility(View.INVISIBLE);
+                recorder.start();
+                recordingTime.start();
+            }
+        };
+    }
+
+    private CountDownTimer getRecordingCountDown(){
+        return new CountDownTimer(5000,1000) {
+            @Override
+            public void onTick(long l) {
+                int a = (int) (l / 1000);
+                tv_time.setText(a + " sec left");
+            }
+
+            @Override
+            public void onFinish() {
+                recorder.stop();
+                recorder.reset();
+                if(recordingTime != null) {
+                    recordingTime.cancel();
+                }
+            }
+        };
     }
 }

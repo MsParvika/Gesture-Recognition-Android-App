@@ -65,50 +65,34 @@ public class SecondActivity extends AppCompatActivity {
         practice.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startCamera();
-                /*secondIntent = new Intent(SecondActivity.this, ThirdActivity.class);
-                secondIntent.putExtra("gestureName", gestureName);
-                startActivity(secondIntent);*/
-
             }
         });
 
     }
 
     public void startCamera() {
-        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            //permission not granted
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.CAMERA)) {
-                //doing nothing
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                        101);
-            }
-        }
 
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-            // Permission not granted
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        100);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-
-        } else {*/
+//        if( ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ) {
+//
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+//
+//            } else {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 101);
+//            }
+//        }
+//
+//
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//
+//            } else {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+//            }
+//
+//        } else {
             // Permission  granted
-            File f = new File(Environment.getExternalStorageDirectory(), "GestureRecognition");
+            File f = new File(Environment.getExternalStorageDirectory(), Constants.APP_NAME);
 
             if (!f.exists()) {
                 f.mkdirs();
@@ -116,9 +100,9 @@ public class SecondActivity extends AppCompatActivity {
 
             startTime = System.currentTimeMillis() - startTime;
 
-            Intent t = new Intent(this, ThirdActivity.class);
-            t.putExtra("gestureName", gestureName);
-            t.putExtra("timeElapsed", startTime);
+            Intent intent = new Intent(this, ThirdActivity.class);
+            intent.putExtra(Constants.ACTION, gestureName);
+            intent.putExtra("timeElapsed", startTime);
 
 
             // TODO : Check this part
@@ -134,10 +118,9 @@ public class SecondActivity extends AppCompatActivity {
 
             // TODO : TIll HERE
 
-            startActivity(t);
+            startActivity(intent);
 
-       // }
-
+//        }
 
     }
 
