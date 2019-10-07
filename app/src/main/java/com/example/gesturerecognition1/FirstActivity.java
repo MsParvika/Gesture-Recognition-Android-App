@@ -30,7 +30,7 @@ public class FirstActivity extends AppCompatActivity {
                                        int position, long id) {
 
                 dropDownValue = (String) gestureDropDown.getSelectedItem();
-                if(!dropDownValue.equalsIgnoreCase("Select...")) {
+                if(!dropDownValue.equalsIgnoreCase("Select One...")) {
                     intent = new Intent(FirstActivity.this, SecondActivity.class);
                     intent.putExtra("gestureName", dropDownValue);
                     startActivity(intent);

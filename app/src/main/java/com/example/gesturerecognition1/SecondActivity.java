@@ -166,7 +166,7 @@ public class SecondActivity extends AppCompatActivity {
         } else if (text.equalsIgnoreCase("mouth")) {
             path = "android.resource://" + getPackageName() + "/" + R.raw.mouth;
         } else if (text.equalsIgnoreCase("communicate")) {
-            path = "android.resource://" + getPackageName() + "/" + R.raw.comm;
+            path = "android.resource://" + getPackageName() + "/" + R.raw.communicate;
         } else if (text.equalsIgnoreCase("some")) {
             path = "android.resource://" + getPackageName() + "/" + R.raw.some;
         } else if (text.equalsIgnoreCase("write")) {
