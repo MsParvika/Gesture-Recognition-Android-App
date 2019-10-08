@@ -20,6 +20,7 @@ public class FirstActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle(Constants.APP_NAME);
         gestureDropDown = (Spinner) findViewById(R.id.gestureDropDown);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(FirstActivity.this, android.R.layout.simple_list_item_1, GESTURES);
 
@@ -32,7 +33,7 @@ public class FirstActivity extends AppCompatActivity {
                 dropDownValue = (String) gestureDropDown.getSelectedItem();
                 if(!dropDownValue.equalsIgnoreCase("Select One...")) {
                     intent = new Intent(FirstActivity.this, SecondActivity.class);
-                    intent.putExtra("gestureName", dropDownValue);
+                    intent.putExtra(Constants.GESTURE_NAME, dropDownValue);
                     startActivity(intent);
                 }
             }

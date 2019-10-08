@@ -5,6 +5,7 @@
     android:layout_height="fill_parent">
 
     <FrameLayout
+        android:id="@+id/camera_frame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -42,4 +43,37 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/recording_decision_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <VideoView
+            android:id="@+id/recordedVideo"
+            android:layout_width="302dp"
+            android:layout_height="406dp" />
+
+        <Button
+            android:id="@+id/upload_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="12pt"
+            android:layout_margin="10dp"
+            android:text="Upload"
+            android:layout_below="@+id/recordedVideo" />
+
+        <Button
+            android:id="@+id/discard_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="12pt"
+            android:layout_margin="10dp"
+            android:text="Discard"
+            android:layout_below="@+id/recordedVideo"
+            android:layout_toRightOf="@+id/upload_button"/>
+    </RelativeLayout>
 </LinearLayout>

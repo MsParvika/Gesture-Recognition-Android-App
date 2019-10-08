@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SecondActivity extends AppCompatActivity {
 
@@ -29,15 +32,24 @@ public class SecondActivity extends AppCompatActivity {
     String gestureName;
     Intent secondIntent;
     long startTime = 0;
-    FileOutputStream fo ;
+    FileOutputStream fo;
     File logFile;
+
+    boolean grantedPermissions = false;
+    String[] permissions = new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.INTERNET};
+    public static final int MULTIPLE_PERMISSIONS = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-        if (getIntent().hasExtra("gestureName")) {
-            gestureName = getIntent().getStringExtra("gestureName");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Practice Gesture");
+        if (getIntent().hasExtra(Constants.GESTURE_NAME)) {
+            gestureName = getIntent().getStringExtra(Constants.GESTURE_NAME);
         }
         viedeoPlaceHolder = (VideoView) findViewById(R.id.signVideo);
         practice = (Button) findViewById(R.id.practice);
@@ -47,7 +59,6 @@ public class SecondActivity extends AppCompatActivity {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mediaPlayer != null) {
                     mediaPlayer.start();
-
                 }
 
             }
@@ -64,48 +75,67 @@ public class SecondActivity extends AppCompatActivity {
 
         practice.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startCamera();
+                if(checkPermissions()){
+                    startRecording();
+                }
             }
         });
 
     }
 
-    public void startCamera() {
-
-//        if( ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ) {
-//
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-//
-//            } else {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 101);
-//            }
-//        }
-//
-//
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//
-//            } else {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
-//            }
-//
-//        } else {
-            // Permission  granted
-            File f = new File(Environment.getExternalStorageDirectory(), Constants.APP_NAME);
-
-            if (!f.exists()) {
-                f.mkdirs();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissionsList[], int[] grantResults) {
+        switch (requestCode) {
+            case MULTIPLE_PERMISSIONS: {
+                if (grantResults.length > 0) {
+                    String permissionsDenied = "";
+                    for (String per : permissionsList) {
+                        if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                            permissionsDenied += "\n" + per;
+                        }else{
+                            grantedPermissions = true;
+                        }
+                    }
+                }
+                if(grantedPermissions){
+                    startRecording();
+                }
             }
+        }
+    }
 
-            startTime = System.currentTimeMillis() - startTime;
+    private boolean checkPermissions() {
+        int result;
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : permissions) {
+            result = ContextCompat.checkSelfPermission(this, p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
+    }
 
-            Intent intent = new Intent(this, ThirdActivity.class);
-            intent.putExtra(Constants.ACTION, gestureName);
-            intent.putExtra("timeElapsed", startTime);
+    private void startRecording() {
+
+        File f = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/");
+
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+
+        startTime = System.currentTimeMillis() - startTime;
+
+        Intent intent = new Intent(this, ThirdActivity.class);
+        intent.putExtra(Constants.GESTURE_NAME, gestureName);
+        intent.putExtra("timeElapsed", startTime);
 
 
-            // TODO : Check this part
+        // TODO : Check this part
            /* final String id = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE).getString(INTENT_ID, "00000000");
             try {
                 fo = new FileOutputStream(logFile, true);
@@ -116,12 +146,9 @@ public class SecondActivity extends AppCompatActivity {
                 Log.e("Exception", "File write failed: " + e.toString());
             }*/
 
-            // TODO : TIll HERE
+        // TODO : TIll HERE
 
-            startActivity(intent);
-
-//        }
-
+        startActivity(intent);
     }
 
 
@@ -177,6 +204,12 @@ public class SecondActivity extends AppCompatActivity {
             viedeoPlaceHolder.start();
         }
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 }
