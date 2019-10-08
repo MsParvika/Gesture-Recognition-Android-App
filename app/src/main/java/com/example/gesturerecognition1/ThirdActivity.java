@@ -77,7 +77,9 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
             @Override
             public void onClick(View v) {
                 UploadVideo uploadVideo = new UploadVideo();
-                uploadVideo.upLoad2Server(file.getPath());
+                //uploadVideo.upLoad2Server(file.getPath());
+                new UploadVideo.UploadService().execute(file.getPath());
+
                 intent = new Intent(ThirdActivity.this, FirstActivity.class);
             }
         });
