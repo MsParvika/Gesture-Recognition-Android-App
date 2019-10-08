@@ -3,6 +3,7 @@ package com.example.gesturerecognition1;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -30,10 +31,12 @@ public class SecondActivity extends AppCompatActivity {
     VideoView viedeoPlaceHolder;
     Button practice;
     String gestureName;
+    String asuId;
     Intent secondIntent;
     long startTime = 0;
     FileOutputStream fo;
     File logFile;
+    private SharedPreferences sp;
 
     boolean grantedPermissions = false;
     String[] permissions = new String[]{
@@ -50,7 +53,10 @@ public class SecondActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Practice Gesture");
         if (getIntent().hasExtra(Constants.GESTURE_NAME)) {
             gestureName = getIntent().getStringExtra(Constants.GESTURE_NAME);
+            asuId = getIntent().getStringExtra(Constants.ASU_ID);
         }
+
+        sp = this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         viedeoPlaceHolder = (VideoView) findViewById(R.id.signVideo);
         practice = (Button) findViewById(R.id.practice);
         startVideo(gestureName);
@@ -128,11 +134,12 @@ public class SecondActivity extends AppCompatActivity {
             f.mkdirs();
         }
 
-        startTime = System.currentTimeMillis() - startTime;
+//        startTime = System.currentTimeMillis() - startTime;
 
         Intent intent = new Intent(this, ThirdActivity.class);
         intent.putExtra(Constants.GESTURE_NAME, gestureName);
-        intent.putExtra("timeElapsed", startTime);
+        intent.putExtra(Constants.ASU_ID, sp.getString(Constants.ASU_ID, ""));
+//        intent.putExtra("timeElapsed", startTime);
 
 
         // TODO : Check this part
@@ -212,4 +219,11 @@ public class SecondActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onRestart() {
+        if (!viedeoPlaceHolder.isPlaying()) {
+            viedeoPlaceHolder.start();
+        }
+        super.onRestart();
+    }
 }

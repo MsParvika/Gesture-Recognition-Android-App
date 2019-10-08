@@ -36,9 +36,10 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private Button mToggleButton;
     private TextView tv_timer;
     private TextView tv_time;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sp;
     private String gestureName;
     private String filePath;
+    private String asuId;
     private File file;
     CountDownTimer countDownTimer;
     CountDownTimer recordingTime;
@@ -76,11 +77,13 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UploadVideo uploadVideo = new UploadVideo();
+//                UploadVideo uploadVideo = new UploadVideo();
                 //uploadVideo.upLoad2Server(file.getPath());
-                new UploadVideo.UploadService().execute(file.getPath());
+                new UploadVideo().execute(file.getPath(), sp.getString(Constants.ASU_ID, ""));
 
                 intent = new Intent(ThirdActivity.this, FirstActivity.class);
+                intent.putExtra(Constants.ASU_ID, sp.getString(Constants.ASU_ID, ""));
+                startActivity(intent);
             }
         });
 
@@ -90,6 +93,7 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
         if(getIntent().hasExtra(Constants.GESTURE_NAME)) {
             gestureName = getIntent().getStringExtra(Constants.GESTURE_NAME);
+            asuId = getIntent().getStringExtra(Constants.ASU_ID);
         }
 
         surfaceView = (SurfaceView) findViewById(R.id.camera);
@@ -99,7 +103,7 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
         tv_timer = (TextView) findViewById(R.id.tv_timer);
         tv_time = (TextView) findViewById(R.id.tv_time);
         mToggleButton = (Button) findViewById(R.id.bt_start);
-        sharedPreferences =  this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        sp =  this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
         recordingTime = getRecordingCountDown();
 
@@ -149,12 +153,12 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
         String format = s.format(new Date());
 
         file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
-                + sharedPreferences.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_0_" + format  + ".mp4");
+                + sp.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_0_" + format  + ".mp4");
 
         while(file.exists()) {
             i++;
             file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
-                    + sharedPreferences.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_" + i + "_" + format + ".mp4");
+                    + sp.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_" + i + "_" + format + ".mp4");
         }
 
         if(file.createNewFile()) {
@@ -252,6 +256,7 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
     @Override
     public boolean onSupportNavigateUp() {
+
         onBackPressed();
         return true;
     }
