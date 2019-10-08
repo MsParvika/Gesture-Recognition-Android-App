@@ -1,6 +1,7 @@
 package com.example.gesturerecognition1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
@@ -45,9 +46,11 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private boolean isInit = false;
     boolean newFile = false;
     VideoView recordedVideoView;
+    Intent intent;
+
 
     private Button uploadButton;
-    private Button discardButton;
+    //private Button discardButton;
 
     private RelativeLayout recordingDecisionLayout;
     private FrameLayout cameraFrameLayout;
@@ -68,13 +71,14 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
         recordedVideoView = (VideoView) findViewById(R.id.recordedVideo);
 
         uploadButton = (Button) findViewById(R.id.upload_button);
-        discardButton = (Button) findViewById(R.id.discard_button);
+        //discardButton = (Button) findViewById(R.id.discard_button);
 
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UploadVideo uploadVideo = new UploadVideo();
                 uploadVideo.upLoad2Server(file.getPath());
+                intent = new Intent(ThirdActivity.this, FirstActivity.class);
             }
         });
 

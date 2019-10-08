@@ -59,21 +59,12 @@
             android:id="@+id/upload_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:textSize="12pt"
-            android:layout_margin="10dp"
-            android:text="Upload"
-            android:layout_below="@+id/recordedVideo" />
-
-        <Button
-            android:id="@+id/discard_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:textSize="12pt"
-            android:layout_margin="10dp"
-            android:text="Discard"
             android:layout_below="@+id/recordedVideo"
-            android:layout_toRightOf="@+id/upload_button"/>
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"
+            android:text="Upload"
+            android:textSize="12pt" />
+
     </RelativeLayout>
 </LinearLayout>
