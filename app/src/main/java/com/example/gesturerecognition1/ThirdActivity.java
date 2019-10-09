@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -40,6 +41,7 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private String gestureName;
     private String filePath;
     private String asuId;
+    private int practiceId;
     private File file;
     CountDownTimer countDownTimer;
     CountDownTimer recordingTime;
@@ -80,7 +82,11 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
 //                UploadVideo uploadVideo = new UploadVideo();
                 //uploadVideo.upLoad2Server(file.getPath());
                 new UploadVideo().execute(file.getPath(), sp.getString(Constants.ASU_ID, ""));
-
+                int practiceCount = sp.getInt(Constants.PRACTICE_COUNT, 0);
+                SharedPreferences.Editor editor = sp.edit();
+                Log.e("fileupload", "pc: " + (practiceCount+1));
+                editor.putInt(Constants.PRACTICE_COUNT, practiceCount+1);
+                editor.commit();
                 intent = new Intent(ThirdActivity.this, FirstActivity.class);
                 intent.putExtra(Constants.ASU_ID, sp.getString(Constants.ASU_ID, ""));
                 startActivity(intent);
@@ -152,14 +158,15 @@ public class ThirdActivity extends AppCompatActivity implements SurfaceHolder.Ca
         SimpleDateFormat s = new SimpleDateFormat("ddMMyyyyhhmmss", Locale.US);
         String format = s.format(new Date());
 
+        practiceId = sp.getInt(Constants.PRACTICE_COUNT, 0);
         file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
-                + sp.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_0_" + format  + ".mp4");
+                + "GESTURE_PRACTICE_" + practiceId + "_" + asuId + ".mp4");
 
-        while(file.exists()) {
-            i++;
-            file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
-                    + sp.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_" + i + "_" + format + ".mp4");
-        }
+//        while(file.exists()) {
+//            i++;
+//            file = new File(getExternalFilesDir(null).getPath() + "/" + Constants.APP_NAME + "/"
+//                    + sp.getString(Constants.RECORDING_ID,"0000") + "_" + gestureName + "_" + i + "_" + format + ".mp4");
+//        }
 
         if(file.createNewFile()) {
             newFile = true;

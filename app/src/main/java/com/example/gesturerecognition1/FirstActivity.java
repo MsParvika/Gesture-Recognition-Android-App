@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,12 +29,17 @@ public class FirstActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle(Constants.APP_NAME);
         gestureDropDown = (Spinner) findViewById(R.id.gestureDropDown);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(FirstActivity.this, android.R.layout.simple_list_item_1, GESTURES);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(FirstActivity.this, R.layout.list_item, GESTURES);
         this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         asuId = (EditText) findViewById(R.id.asu_id);
         sp =  this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+
         if(getIntent().getStringExtra(Constants.ASU_ID) != null){
             asuId.setText(getIntent().getStringExtra(Constants.ASU_ID));
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(Constants.ASU_ID, asuId.getText().toString());
+//            Log.e("practiceCount", "practice count reset");
+            editor.commit();
         }
 
         gestureDropDown.setAdapter(adapter);
@@ -47,11 +53,19 @@ public class FirstActivity extends AppCompatActivity {
                     intent = new Intent(FirstActivity.this, SecondActivity.class);
                     intent.putExtra(Constants.GESTURE_NAME, dropDownValue);
 
-                    if(!asuId.getText().toString().equals("") || asuId.getText() != null){
+                    if(!asuId.getText().toString().equals(sp.getString(Constants.ASU_ID, "abc"))){
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putString(Constants.ASU_ID, asuId.getText().toString());
+                        editor.putInt(Constants.PRACTICE_COUNT, 1);
+                        Log.e("practiceCount", "practice count reset");
                         editor.commit();
                     }
+
+//                    if(!asuId.getText().toString().equals(sp.getString(Constants.ASU_ID, ""))){
+//                        SharedPreferences.Editor editor = sp.edit();
+//
+//                        editor.commit();
+//                    }
 
                     intent.putExtra(Constants.ASU_ID, sp.getString(Constants.ASU_ID, ""));
                     startActivity(intent);
