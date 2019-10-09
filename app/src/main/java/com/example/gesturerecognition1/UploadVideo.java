@@ -39,7 +39,7 @@ public class UploadVideo extends AsyncTask<String, Void, Boolean> {
         String boundary = Long.toHexString(System.currentTimeMillis()); // Just generate some unique random value.
         String CRLF = "\r\n"; // Line separator required by multipart/form-data.
 
-        String url =  "http://10.157.78.199/upload_video.php"; // "http://10.218.107.121/cse535/upload_video.php";
+        String url =  "http://10.218.107.121/cse535/upload_video.php"; //"http://10.157.78.199/upload_video.php";
 
         String charset = "UTF-8";
         String group_id = "12";
